@@ -58,7 +58,7 @@ void addToStartupLinux(const std::string &path) {
                                           "NoDisplay=false\n"
                                           "X-GNOME-Autostart-enabled=true\n"
                                           "Name=null' > ~/.config/autostart/null.desktop";
-    system(command.c_str());
+    (void) system(command.c_str());
 }
 #endif
 
