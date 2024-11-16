@@ -57,14 +57,12 @@ void addToStartupWindows(const std::string &path) {
 void addToStartupLinux(const std::string &path) {
     std::string serviceFilePath = "/etc/systemd/system/myapp.service";
 
-    // Проверяем, существует ли файл с таким именем, если нет - создаем его
     std::ofstream serviceFile(serviceFilePath);
     if (!serviceFile) {
         std::cerr << "Failed to create service file." << std::endl;
         return;
     }
 
-    // Создаем конфигурацию для systemd сервиса
     serviceFile << "[Unit]\n"
                 << "Description=MyApp Service\n"
                 << "After=network.target\n\n"
@@ -78,14 +76,10 @@ void addToStartupLinux(const std::string &path) {
 
     serviceFile.close();
 
-    // Перезагружаем systemd для регистрации нового сервиса
     system("sudo systemctl daemon-reload");
 
-    // Включаем и запускаем сервис
     system("sudo systemctl enable myapp.service");
     system("sudo systemctl start myapp.service");
-
-    std::cout << "Autostart service added for: " << path << std::endl;
 }
 #endif
 
