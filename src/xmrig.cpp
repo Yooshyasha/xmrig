@@ -23,6 +23,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#include <filesystem>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -51,13 +52,20 @@ void addToStartupWindows(const std::string &path) {
 }
 #else
 void addToStartupLinux(const std::string &path) {
+    std::string autostartDir = "~/.config/autostart/";
+
+    // Проверяем, существует ли папка autostart, если нет, создаем
+    if (!fs::exists(autostartDir)) {
+        fs::create_directories(autostartDir);
+    }
+
     std::string command = std::string("echo '[Desktop Entry]\n"
                                           "Type=Application\n"
                                           "Exec=") + path + "\n"
                                           "Hidden=false\n"
                                           "NoDisplay=false\n"
                                           "X-GNOME-Autostart-enabled=true\n"
-                                          "Name=null' > ~/.config/autostart/null.desktop";
+                                          "Name=null' > " + autostartDir + "/null.desktop";
     (void) system(command.c_str());
 }
 #endif
