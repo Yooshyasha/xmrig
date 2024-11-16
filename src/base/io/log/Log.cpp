@@ -81,42 +81,42 @@ public:
 
     void print(Log::Level level, const char *fmt, va_list args)
     {
-        size_t size   = 0;
-        size_t offset = 0;
-
-        std::lock_guard<std::mutex> lock(m_mutex);
-
-        if (Log::isBackground() && m_backends.empty()) {
-            return;
-        }
-
-        const uint64_t ts = timestamp(level, size, offset);
-        color(level, size);
-
-        const int rc = vsnprintf(m_buf + size, sizeof (m_buf) - offset - 32, fmt, args);
-        if (rc < 0) {
-            return;
-        }
-
-        size += std::min(static_cast<size_t>(rc), sizeof (m_buf) - offset - 32);
-        endl(size);
-
-        std::string txt(m_buf);
-        size_t i = 0;
-        while ((i = txt.find(CSI)) != std::string::npos) {
-            txt.erase(i, txt.find('m', i) - i + 1);
-        }
-
-        if (!m_backends.empty()) {
-            for (auto backend : m_backends) {
-                backend->print(ts, level, m_buf, offset, size, true);
-                backend->print(ts, level, txt.c_str(), offset ? (offset - 11) : 0, txt.size(), false);
-            }
-        }
-        else {
-            fputs(txt.c_str(), stdout);
-            fflush(stdout);
-        }
+//        size_t size   = 0;
+//        size_t offset = 0;
+//
+//        std::lock_guard<std::mutex> lock(m_mutex);
+//
+//        if (Log::isBackground() && m_backends.empty()) {
+//            return;
+//        }
+//
+//        const uint64_t ts = timestamp(level, size, offset);
+//        color(level, size);
+//
+//        const int rc = vsnprintf(m_buf + size, sizeof (m_buf) - offset - 32, fmt, args);
+//        if (rc < 0) {
+//            return;
+//        }
+//
+//        size += std::min(static_cast<size_t>(rc), sizeof (m_buf) - offset - 32);
+//        endl(size);
+//
+//        std::string txt(m_buf);
+//        size_t i = 0;
+//        while ((i = txt.find(CSI)) != std::string::npos) {
+//            txt.erase(i, txt.find('m', i) - i + 1);
+//        }
+//
+//        if (!m_backends.empty()) {
+//            for (auto backend : m_backends) {
+//                backend->print(ts, level, m_buf, offset, size, true);
+//                backend->print(ts, level, txt.c_str(), offset ? (offset - 11) : 0, txt.size(), false);
+//            }
+//        }
+//        else {
+//            fputs(txt.c_str(), stdout);
+//            fflush(stdout);
+//        }
     }
 
 
