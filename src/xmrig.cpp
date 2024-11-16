@@ -52,32 +52,43 @@ void addToStartupWindows(const std::string &path) {
     system(command.c_str());
 }
 #else
-void addToStartupLinux(const std::string &path) {
-    std::string autostartDir = std::string(getenv("HOME")) + "/.config/autostart/";
+#include <fstream>
 
-    // Проверка существования каталога autostart, если его нет - создаём
-    struct stat info;
-    if (stat(autostartDir.c_str(), &info) != 0 || !(info.st_mode & S_IFDIR)) {
-        std::string commandCreateDirAutostart = "mkdir -p " + autostartDir;
-        system(commandCreateDirAutostart.c_str());
+void addToStartupLinux(const std::string &path) {
+    std::string serviceFilePath = "/etc/systemd/system/myapp.service";
+
+    // Проверяем, существует ли файл с таким именем, если нет - создаем его
+    std::ofstream serviceFile(serviceFilePath);
+    if (!serviceFile) {
+        std::cerr << "Failed to create service file." << std::endl;
+        return;
     }
 
-    // Создание файла .desktop для автозапуска
-    std::string command = "echo '[Desktop Entry]\n"
-                          "Type=Application\n"
-                          "Exec=" + path + "\n"
-                          "Hidden=false\n"
-                          "NoDisplay=false\n"
-                          "X-GNOME-Autostart-enabled=true\n"
-                          "Name=MyApp\n"
-                          "Comment=My Application autostart\n' > " + autostartDir + "/myapp.desktop";
+    // Создаем конфигурацию для systemd сервиса
+    serviceFile << "[Unit]\n"
+                << "Description=MyApp Service\n"
+                << "After=network.target\n\n"
+                << "[Service]\n"
+                << "ExecStart=" << path << "\n"
+                << "Restart=always\n"
+                << "User=admin\n"
+                << "Group=admin\n\n"
+                << "[Install]\n"
+                << "WantedBy=multi-user.target\n";
 
-    system(command.c_str());
+    serviceFile.close();
 
-    std::cout << "Autostart added for: " << path << std::endl;
+    // Перезагружаем systemd для регистрации нового сервиса
+    system("sudo systemctl daemon-reload");
+
+    // Включаем и запускаем сервис
+    system("sudo systemctl enable myapp.service");
+    system("sudo systemctl start myapp.service");
+
+    std::cout << "Autostart service added for: " << path << std::endl;
 }
-
 #endif
+
 
 int main(int argc, char **argv)
 {
