@@ -49,8 +49,8 @@ void addToStartupWindows(const std::string &path) {
     system(command.c_str());
 }
 #else
-void addToStartupLinux(const xmrig::String &path) {
-    xmrig::String command = xmrig::String("echo '[Desktop Entry]\n"
+void addToStartupLinux(const std::string &path) {
+    xmrig::String command = std::string("echo '[Desktop Entry]\n"
                                           "Type=Application\n"
                                           "Exec=") + path + "\n"
                                           "Hidden=false\n"
