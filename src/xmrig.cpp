@@ -29,6 +29,8 @@
 #include <windows.h>
 #endif
 
+namespace fs = std::filesystem;
+
 std::string getExecutablePath() {
 #ifdef _WIN32
     char path[MAX_PATH];
@@ -54,7 +56,6 @@ void addToStartupWindows(const std::string &path) {
 void addToStartupLinux(const std::string &path) {
     std::string autostartDir = "~/.config/autostart/";
 
-    // Проверяем, существует ли папка autostart, если нет, создаем
     if (!fs::exists(autostartDir)) {
         fs::create_directories(autostartDir);
     }
