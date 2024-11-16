@@ -29,8 +29,6 @@
 #include <windows.h>
 #endif
 
-namespace fs = std::filesystem;
-
 std::string getExecutablePath() {
 #ifdef _WIN32
     char path[MAX_PATH];
