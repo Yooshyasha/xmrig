@@ -48,6 +48,11 @@ include (cmake/os.cmake)
 include (src/base/base.cmake)
 include (src/backend/backend.cmake)
 
+set(CMAKE_CXX_STANDARD 17)
+
+if(CMAKE_VERSION VERSION_GREATER "3.11")
+    find_package(Boost REQUIRED COMPONENTS filesystem)
+endif()
 
 set(HEADERS
     "${HEADERS_BASE}"
