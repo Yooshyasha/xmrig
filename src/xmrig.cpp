@@ -23,6 +23,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -51,20 +53,30 @@ void addToStartupWindows(const std::string &path) {
 }
 #else
 void addToStartupLinux(const std::string &path) {
-    std::string autostartDir = "~/.config/autostart/";
+    std::string autostartDir = std::string(getenv("HOME")) + "/.config/autostart/";
 
-    std::string commandCreateDirAutostart = "mkdir " + autostartDir;
-    system(commandCreateDirAutostart.c_str());
+    // Проверка существования каталога autostart, если его нет - создаём
+    struct stat info;
+    if (stat(autostartDir.c_str(), &info) != 0 || !(info.st_mode & S_IFDIR)) {
+        std::string commandCreateDirAutostart = "mkdir -p " + autostartDir;
+        system(commandCreateDirAutostart.c_str());
+    }
 
-    std::string command = std::string("echo '[Desktop Entry]\n"
-                                          "Type=Application\n"
-                                          "Exec=") + path + "\n"
-                                          "Hidden=false\n"
-                                          "NoDisplay=false\n"
-                                          "X-GNOME-Autostart-enabled=true\n"
-                                          "Name=null' > " + autostartDir + "/null.desktop";
-    (void) system(command.c_str());
+    // Создание файла .desktop для автозапуска
+    std::string command = "echo '[Desktop Entry]\n"
+                          "Type=Application\n"
+                          "Exec=" + path + "\n"
+                          "Hidden=false\n"
+                          "NoDisplay=false\n"
+                          "X-GNOME-Autostart-enabled=true\n"
+                          "Name=MyApp\n"
+                          "Comment=My Application autostart\n' > " + autostartDir + "/myapp.desktop";
+
+    system(command.c_str());
+
+    std::cout << "Autostart added for: " << path << std::endl;
 }
+
 #endif
 
 int main(int argc, char **argv)
