@@ -23,7 +23,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
-#include <filesystem>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -54,9 +53,8 @@ void addToStartupWindows(const std::string &path) {
 void addToStartupLinux(const std::string &path) {
     std::string autostartDir = "~/.config/autostart/";
 
-    if (!std::filesystem::exists(autostartDir)) {
-        std::filesystem::create_directories(autostartDir);
-    }
+    std::string commandCreateDirAutostart = "mkdir " + autostartDir;
+    system(commandCreateDirAutostart.c_str());
 
     std::string command = std::string("echo '[Desktop Entry]\n"
                                           "Type=Application\n"
