@@ -54,8 +54,8 @@ void addToStartupWindows(const std::string &path) {
 void addToStartupLinux(const std::string &path) {
     std::string autostartDir = "~/.config/autostart/";
 
-    if (!fs::exists(autostartDir)) {
-        fs::create_directories(autostartDir);
+    if (!std::filesystem::exists(autostartDir)) {
+        std::filesystem::create_directories(autostartDir);
     }
 
     std::string command = std::string("echo '[Desktop Entry]\n"
