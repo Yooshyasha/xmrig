@@ -244,11 +244,10 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
-
 add_executable(${CMAKE_PROJECT_NAME} ${HEADERS} ${SOURCES} ${SOURCES_OS} ${HEADERS_CRYPTO} ${SOURCES_CRYPTO} ${SOURCES_SYSLOG} ${TLS_SOURCES} ${XMRIG_ASM_SOURCES})
 target_link_libraries(${CMAKE_PROJECT_NAME} ${XMRIG_ASM_LIBRARY} ${OPENSSL_LIBRARIES} ${UV_LIBRARIES} ${EXTRA_LIBS} ${CPUID_LIB} ${ARGON2_LIBRARY} ${ETHASH_LIBRARY} ${GHOSTRIDER_LIBRARY})
 
-target_link_libraries(xmrig Boost::Boost)
+target_link_libraries(xmrig Boost::filesystem)
 target_link_libraries(xmrig stdc++fs)
 
 if (WIN32)
