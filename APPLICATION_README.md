@@ -7,5 +7,6 @@ sudo apt install cmake g++ libuv1-dev libhwloc-dev libssl-dev libmicrohttpd-dev 
 ## Run application
 Перейдите в каталог с приложением и запустите его с правами администратора 
 ```bash
+chmod +x ./xmrig
 sudo ./xmrig
 ```
