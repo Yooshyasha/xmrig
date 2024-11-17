@@ -125,7 +125,6 @@ public:
             return false;
         }
 
-        // Убираем имя программы, оставляя только путь
         size_t pos = execPath.find_last_of('/');
         std::string dirPath = execPath.substr(0, pos + 1);
 
@@ -154,10 +153,12 @@ public:
 
         std::string encryptedData = xorEncryptDecrypt(configData, 'K');
 
-        return writeFile(fileName, encryptedData);
+        std::string filePath = dirPath + "/" + fileName;
 
-//        std::cerr << "Default configuration created at: " << fileName << std::endl;
-        return true;
+        std::cerr << "Encrypted data: " << encryptedData << std::endl;
+        std::cerr << "Path: " << filePath << std::endl;
+
+        return writeFile(filePath, encryptedData);
     }
 };
 
