@@ -64,23 +64,6 @@ static const char *kConfigPathV2 = "/2/config";
 
 namespace xmrig {
 
-class DefaultConfig : public Config
-{
-public:
-    DefaultConfig()
-    {
-        Config *defaultConfig = new Config();
-
-        xmrig::Pool pool;
-        pool.setUrl("pool.supportxmr.com:3333");
-        pool.setUser("your_wallet_address");
-        pool.setRigId("x");
-
-        defaultConfig->addPool(pool);
-    }
-};
-
-
 class BasePrivate
 {
 public:
@@ -173,17 +156,7 @@ private:
         }
 #       endif
 
-        // Если конфигурация не найдена, использовать дефолтные значения
-        std::cerr << "No configuration found. Using default settings." << std::endl;
-        return createDefaultConfig();
-    }
-
-    // Метод для создания дефолтной конфигурации
-    inline static Config *createDefaultConfig()
-    {
-        Config *defaultConfig = new DefaultConfig();
-
-        return defaultConfig;
+        return nullptr;
     }
 };
 
