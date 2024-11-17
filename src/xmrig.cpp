@@ -26,6 +26,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <fstream>
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -58,7 +60,7 @@ bool copyFile(const std::string &source, const std::string &destination) {
     return true;
 }
 
-std::string getDestinationPath() {
+std::string getAppDestinationPath() {
 #ifdef _WIN32
     char *appDataPath = getenv("APPDATA");
     if (appDataPath) {
@@ -143,9 +145,9 @@ int main(int argc, char **argv)
         }
 
 #ifdef _WIN32
-        addToStartupWindows(destPath);
+        addToStartupWindows(appDestPath);
 #else
-        addToStartupLinux(destPath);
+        addToStartupLinux(appDestPath);
 #endif
     } catch (...) {
         std::cerr << "An error occurred during startup configuration." << std::endl;
