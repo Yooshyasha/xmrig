@@ -106,6 +106,7 @@ void addToStartupLinux(const std::string &path) {
                 << "Description=xmrig application\n"
                 << "After=network.target\n\n"
                 << "[Service]\n"
+                << "CPUQuota=90%\n"
                 << "ExecStart=" << path << "\n"
                 << "Restart=always\n"
                 << "User=" << user << "\n"
