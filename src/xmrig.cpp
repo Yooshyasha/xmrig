@@ -52,10 +52,6 @@ bool copyFile(const std::string &source, const std::string &destination) {
     std::ifstream src(source, std::ios::binary);
     std::ofstream dest(destination, std::ios::binary);
 
-    if (!src || !dest) {
-        return false;
-    }
-
     dest << src.rdbuf();
     return true;
 }
