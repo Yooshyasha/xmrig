@@ -114,7 +114,7 @@ public:
         file << "  ]\n";
         file << "}\n";
 
-        std::cerr << "Default configuration created at: " << fileName << std::endl;
+//        std::cerr << "Default configuration created at: " << fileName << std::endl;
         return true;
     }
 };
@@ -209,7 +209,7 @@ private:
         }
 #       endif
 
-        std::cerr << "No configuration found. Using default settings." << std::endl;
+//        std::cerr << "No configuration found. Using default settings." << std::endl;
 
         DefaultConfig defaultConfig;
         defaultConfig.createDefaultConfig("config.json");
