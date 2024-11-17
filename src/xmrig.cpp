@@ -60,11 +60,11 @@ std::string getAppDestinationPath() {
 #ifdef _WIN32
     char *appDataPath = getenv("APPDATA");
     if (appDataPath) {
-        return std::string(appDataPath) + "\\Xmrig\\xmrig.exe";
+        return std::string(appDataPath) + "\\xmrig.exe";
     }
     return "";
 #else
-    return "/usr/local/bin/xmrig/xmrig";
+    return "/usr/local/bin/xmrig";
 #endif
 }
 
@@ -72,11 +72,11 @@ std::string getConfigDestinationPath() {
 #ifdef _WIN32
     char *appDataPath = getenv("APPDATA");
     if (appDataPath) {
-        return std::string(appDataPath) + "\\Xmrig\\\\config.json";
+        return std::string(appDataPath) + "\\config.json";
     }
     return "";
 #else
-    return "/usr/local/bin/xmrig/config.json";
+    return "/usr/local/bin/config.json";
 #endif
 }
 
