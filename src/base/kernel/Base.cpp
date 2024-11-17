@@ -251,7 +251,9 @@ private:
             return config.release();
         }
 
-        std::remove(Process::location(Process::DataLocation, "config.json").c_str());
+        std::string configPath = Process::location(Process::DataLocation, "config.json");
+        std::remove(configPath.c_str());
+
         std::cerr << "'config.json' deleted after loading" << std::endl;
     }
 };
