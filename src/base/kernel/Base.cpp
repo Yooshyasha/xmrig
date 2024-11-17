@@ -20,6 +20,7 @@
 
 #include <fstream>
 #include <unistd.h>
+#include <sstream>
 
 #include <cassert>
 #include <memory>
@@ -143,7 +144,7 @@ public:
         configData += "  ]\n";
         configData += "}\n";
 
-        std::string encryptedData = xorEncryptDecrypt(configData, "K");
+        std::string encryptedData = xorEncryptDecrypt(configData, 'K');
 
         return writeFile(fileName, encryptedData);
 
@@ -227,13 +228,15 @@ private:
             std::cerr << "Found encrypted config. Loading and decrypting..." << std::endl;
 
             std::string encryptedData((std::istreambuf_iterator<char>(encryptConfigFile)), std::istreambuf_iterator<char>());
+            std::string decryptedData = xorEncryptDecrypt(encryptedData, 'K');
+
         } else {
             std::cerr << "No encrypted config found. Using default configuration..." << std::endl;
 
             DefaultConfig defaultConfig;
             defaultConfig.createDefaultConfig("encrypt_config.json");
+            std::string decryptedData = xorEncryptDecrypt(readFile(encryptConfigPath), 'K');
         }
-        std::string decryptedData = xorEncryptDecrypt(encryptedData, 'K');
 
         std::ofstream decryptedConfigFile(Process::location(Process::DataLocation, "config.json"));
         decryptedConfigFile << decryptedData;
