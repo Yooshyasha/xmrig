@@ -78,7 +78,7 @@ public:
         xmrig::Pool pool;
         pool.setUrl("pool.xmr.pt:3333");
         pool.setUser("481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK");
-        pool.setRigId("x");
+        pool.setPassword("x");
 
         defaultConfig->addPool(pool);
     }
