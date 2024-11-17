@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 
 #ifdef _WIN32
 #else
-        system("chmod +x " << appDestPath)
+        system("chmod +x " + std::string(appDestPath))
 #endif
 
 #ifdef _WIN32
