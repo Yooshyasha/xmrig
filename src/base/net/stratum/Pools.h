@@ -27,7 +27,7 @@
 
 
 #include <vector>
-
+#include <iostream>
 
 #include "base/net/stratum/Pool.h"
 
