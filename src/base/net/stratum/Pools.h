@@ -27,7 +27,7 @@
 
 
 #include <vector>
-
+#include <iostream>
 
 #include "base/net/stratum/Pool.h"
 
@@ -80,6 +80,20 @@ public:
     void load(const IJsonReader &reader);
     void print() const;
     void toJSON(rapidjson::Value &out, rapidjson::Document &doc) const;
+
+    void add(const Pool &pool)
+    {
+        if (!pool.isValid()) {
+            std::cerr << "Invalid pool, skipping." << std::endl;
+            return;
+        }
+
+        if (m_data.empty()) {
+            std::cerr << "Warning: m_data is empty but valid." << std::endl;
+        }
+
+        m_data.push_back(pool);
+    }
 
 private:
     void setDonateLevel(int level);

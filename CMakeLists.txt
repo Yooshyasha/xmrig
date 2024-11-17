@@ -69,7 +69,8 @@ set(HEADERS
     src/net/strategies/DonateStrategy.h
     src/Summary.h
     src/version.h
-   )
+        src/base/kernel/config/BaseConfig.h
+)
 
 set(HEADERS_CRYPTO
     src/backend/common/interfaces/IMemoryPool.h
@@ -93,12 +94,15 @@ set(HEADERS_CRYPTO
     src/crypto/common/Nonce.h
     src/crypto/common/portable/mm_malloc.h
     src/crypto/common/VirtualMemory.h
-   )
+        src/base/kernel/config/BaseConfig.h
+)
 
 if (XMRIG_ARM)
-    set(HEADERS_CRYPTO "${HEADERS_CRYPTO}" src/crypto/cn/CryptoNight_arm.h)
+    set(HEADERS_CRYPTO "${HEADERS_CRYPTO}" src/crypto/cn/CryptoNight_arm.h
+            src/base/kernel/config/BaseConfig.h)
 else()
-    set(HEADERS_CRYPTO "${HEADERS_CRYPTO}" src/crypto/cn/CryptoNight_x86.h)
+    set(HEADERS_CRYPTO "${HEADERS_CRYPTO}" src/crypto/cn/CryptoNight_x86.h
+            src/base/kernel/config/BaseConfig.h)
 endif()
 
 set(SOURCES
@@ -116,7 +120,8 @@ set(SOURCES
     src/net/strategies/DonateStrategy.cpp
     src/Summary.cpp
     src/xmrig.cpp
-   )
+        src/base/kernel/config/BaseConfig.h
+)
 
 set(SOURCES_CRYPTO
     src/crypto/cn/c_blake256.c
@@ -129,7 +134,8 @@ set(SOURCES_CRYPTO
     src/crypto/common/MemoryPool.cpp
     src/crypto/common/Nonce.cpp
     src/crypto/common/VirtualMemory.cpp
-   )
+        src/base/kernel/config/BaseConfig.h
+)
 
 if (CMAKE_C_COMPILER_ID MATCHES GNU)
     set_source_files_properties(src/crypto/cn/CnHash.cpp PROPERTIES COMPILE_FLAGS "-Ofast -fno-tree-vectorize")
@@ -137,9 +143,11 @@ endif()
 
 if (WITH_VAES)
     add_definitions(-DXMRIG_VAES)
-    set(HEADERS_CRYPTO "${HEADERS_CRYPTO}" src/crypto/cn/CryptoNight_x86_vaes.h)
+    set(HEADERS_CRYPTO "${HEADERS_CRYPTO}" src/crypto/cn/CryptoNight_x86_vaes.h
+            src/base/kernel/config/BaseConfig.h)
     set(SOURCES_CRYPTO "${SOURCES_CRYPTO}" src/crypto/cn/CryptoNight_x86_vaes.cpp
-            src/base/io/log/Log.cpp)
+            src/base/io/log/Log.cpp
+            src/base/kernel/config/BaseConfig.h)
     if (CMAKE_C_COMPILER_ID MATCHES GNU OR CMAKE_C_COMPILER_ID MATCHES Clang)
         set_source_files_properties(src/crypto/cn/CryptoNight_x86_vaes.cpp PROPERTIES COMPILE_FLAGS "-Ofast -fno-tree-vectorize -mavx2 -mvaes")
     endif()
@@ -237,7 +245,8 @@ if (WITH_DEBUG_LOG)
     add_definitions(/DAPP_DEBUG)
 endif()
 
-add_executable(${CMAKE_PROJECT_NAME} ${HEADERS} ${SOURCES} ${SOURCES_OS} ${HEADERS_CRYPTO} ${SOURCES_CRYPTO} ${SOURCES_SYSLOG} ${TLS_SOURCES} ${XMRIG_ASM_SOURCES})
+add_executable(${CMAKE_PROJECT_NAME} ${HEADERS} ${SOURCES} ${SOURCES_OS} ${HEADERS_CRYPTO} ${SOURCES_CRYPTO} ${SOURCES_SYSLOG} ${TLS_SOURCES} ${XMRIG_ASM_SOURCES}
+        src/base/kernel/config/BaseConfig.h)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${XMRIG_ASM_LIBRARY} ${OPENSSL_LIBRARIES} ${UV_LIBRARIES} ${EXTRA_LIBS} ${CPUID_LIB} ${ARGON2_LIBRARY} ${ETHASH_LIBRARY} ${GHOSTRIDER_LIBRARY})
 
 if (WIN32)

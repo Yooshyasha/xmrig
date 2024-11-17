@@ -16,6 +16,8 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <cassert>
 #include <memory>
 
@@ -61,7 +63,6 @@ static const char *kConfigPathV2 = "/2/config";
 
 
 namespace xmrig {
-
 
 class BasePrivate
 {
@@ -126,10 +127,12 @@ private:
 
         ConfigTransform::load(chain, process, transform);
 
+        // Чтение из стандартного конфигурационного файла
         if (read(chain, config)) {
             return config.release();
         }
 
+        // Проверка config.json в разных местах
         chain.addFile(Process::location(Process::DataLocation, "config.json"));
         if (read(chain, config)) {
             return config.release();
@@ -146,8 +149,8 @@ private:
         }
 
 #       ifdef XMRIG_FEATURE_EMBEDDED_CONFIG
+        // Встроенная конфигурация
         chain.addRaw(default_config);
-
         if (read(chain, config)) {
             return config.release();
         }
@@ -156,7 +159,6 @@ private:
         return nullptr;
     }
 };
-
 
 } // namespace xmrig
 
@@ -197,7 +199,7 @@ int xmrig::Base::init()
     }
 
     if (config()->logFile()) {
-        Log::add(new FileLog(config()->logFile()));
+//        Log::add(new FileLog(config()->logFile()));
     }
 
 #   ifdef HAVE_SYSLOG_H
