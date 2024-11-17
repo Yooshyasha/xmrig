@@ -262,9 +262,9 @@ private:
             return config.release();
         }
 
-        std::remove(configPath.c_str());
-
-        std::cerr << "'config.json' deleted after loading" << std::endl;
+//        std::remove(configPath.c_str());
+//
+//        std::cerr << "'config.json' deleted after loading" << std::endl;
 
         return 0;
     }
