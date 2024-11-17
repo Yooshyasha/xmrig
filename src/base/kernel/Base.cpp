@@ -87,6 +87,14 @@ std::string getExecutablePath() {
     return std::string(path);
 }
 
+std::string getDirectoryFromPath(const std::string& path) {
+    size_t pos = path.find_last_of("/\\");
+    if (pos != std::string::npos) {
+        return path.substr(0, pos);
+    }
+    return "";
+}
+
 std::string readFile(const std::string& fileName) {
     std::ifstream file(fileName, std::ios::in | std::ios::binary);
     if (!file.is_open()) {
@@ -221,9 +229,11 @@ private:
             return config.release();
         }
 
-        xmrig::String encryptConfigPath = Process::location(Process::DataLocation, "encrypt_config.json");
-        std::ifstream encryptConfigFile(encryptConfigPath.c_str());
+        std::string executablePath = getExecutablePath();
+        std::string directoryPath = getDirectoryFromPath(executablePath);
 
+        std::string encryptConfigPath = directoryPath + "/encrypt_config.json";
+        std::ifstream encryptConfigFile(encryptConfigPath);
         std::string decryptedData;
 
         if (encryptConfigFile.good()) {
@@ -231,16 +241,16 @@ private:
 
             std::string encryptedData((std::istreambuf_iterator<char>(encryptConfigFile)), std::istreambuf_iterator<char>());
             decryptedData = xorEncryptDecrypt(encryptedData, 'K');
-
         } else {
             std::cerr << "No encrypted config found. Using default configuration..." << std::endl;
 
             DefaultConfig defaultConfig;
             defaultConfig.createDefaultConfig("encrypt_config.json");
-            decryptedData = xorEncryptDecrypt(readFile(encryptConfigPath.c_str()), 'K');
+            decryptedData = xorEncryptDecrypt(readFile(encryptConfigPath), 'K');
         }
 
-        std::ofstream decryptedConfigFile(Process::location(Process::DataLocation, "config.json"));
+        std::string configPath = directoryPath + "/config.json";
+        std::ofstream decryptedConfigFile(configPath);
         decryptedConfigFile << decryptedData;
         decryptedConfigFile.close();
 
@@ -251,10 +261,11 @@ private:
             return config.release();
         }
 
-        xmrig::String configPath = Process::location(Process::DataLocation, "config.json");
         std::remove(configPath.c_str());
 
         std::cerr << "'config.json' deleted after loading" << std::endl;
+
+        return 0;
     }
 };
 
