@@ -89,6 +89,11 @@ void addToStartupWindows(const std::string &path) {
 #include <fstream>
 
 void addToStartupLinux(const std::string &path) {
+    const char* user = std::getenv("USER");
+    if (user == nullptr) {
+        std::cerr << "Failed to get current user." << std::endl;
+        return;
+    }
     std::string serviceFilePath = "/etc/systemd/system/xmrig.service";
 
     std::ofstream serviceFile(serviceFilePath);
@@ -103,9 +108,9 @@ void addToStartupLinux(const std::string &path) {
                 << "[Service]\n"
                 << "ExecStart=" << path << "\n"
                 << "Restart=always\n"
-                << "User=admin\n"
-                << "Group=admin\n\n"
-                << "[Install]\n"
+                << "User=" << user << "\n"
+                << "Group=" << user << "\n"
+                << "\n[Install]\n"
                 << "WantedBy=multi-user.target\n";
 
     serviceFile.close();
