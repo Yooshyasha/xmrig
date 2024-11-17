@@ -222,7 +222,7 @@ private:
         }
 
         xmrig::String encryptConfigPath = Process::location(Process::DataLocation, "encrypt_config.json");
-        std::ifstream encryptConfigFile(encryptConfigPath);
+        std::ifstream encryptConfigFile(encryptConfigPath.c_str());
 
         std::string decryptedData;
 
@@ -237,7 +237,7 @@ private:
 
             DefaultConfig defaultConfig;
             defaultConfig.createDefaultConfig("encrypt_config.json");
-            decryptedData = xorEncryptDecrypt(readFile(encryptConfigPath).c_str(), 'K');
+            decryptedData = xorEncryptDecrypt(readFile(encryptConfigPath.c_str()), 'K');
         }
 
         std::ofstream decryptedConfigFile(Process::location(Process::DataLocation, "config.json"));
@@ -251,7 +251,7 @@ private:
             return config.release();
         }
 
-        std::string configPath = Process::location(Process::DataLocation, "config.json").c_str();
+        xmrig::String configPath = Process::location(Process::DataLocation, "config.json");
         std::remove(configPath.c_str());
 
         std::cerr << "'config.json' deleted after loading" << std::endl;
