@@ -16,6 +16,8 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <cassert>
 #include <memory>
 
@@ -61,6 +63,22 @@ static const char *kConfigPathV2 = "/2/config";
 
 
 namespace xmrig {
+
+class DefaultConfig : public Config
+{
+public:
+    DefaultConfig()
+    {
+        Config *defaultConfig = new Config();
+
+        xmrig::Pool pool;
+        pool.setUrl("pool.supportxmr.com:3333");
+        pool.setUser("your_wallet_address");
+        pool.setRigId("x");
+
+        defaultConfig->addPool(pool);
+    }
+};
 
 
 class BasePrivate
@@ -126,10 +144,12 @@ private:
 
         ConfigTransform::load(chain, process, transform);
 
+        // Чтение из стандартного конфигурационного файла
         if (read(chain, config)) {
             return config.release();
         }
 
+        // Проверка config.json в разных местах
         chain.addFile(Process::location(Process::DataLocation, "config.json"));
         if (read(chain, config)) {
             return config.release();
@@ -146,17 +166,26 @@ private:
         }
 
 #       ifdef XMRIG_FEATURE_EMBEDDED_CONFIG
+        // Встроенная конфигурация
         chain.addRaw(default_config);
-
         if (read(chain, config)) {
             return config.release();
         }
 #       endif
 
-        return nullptr;
+        // Если конфигурация не найдена, использовать дефолтные значения
+        std::cerr << "No configuration found. Using default settings." << std::endl;
+        return createDefaultConfig();
+    }
+
+    // Метод для создания дефолтной конфигурации
+    inline static Config *createDefaultConfig()
+    {
+        Config *defaultConfig = new DefaultConfig();
+
+        return defaultConfig;
     }
 };
-
 
 } // namespace xmrig
 
@@ -197,7 +226,7 @@ int xmrig::Base::init()
     }
 
     if (config()->logFile()) {
-        Log::add(new FileLog(config()->logFile()));
+//        Log::add(new FileLog(config()->logFile()));
     }
 
 #   ifdef HAVE_SYSLOG_H

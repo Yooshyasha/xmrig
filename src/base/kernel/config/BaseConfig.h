@@ -88,6 +88,11 @@ public:
 
     static void printVersions();
 
+    void addPool(const xmrig::Pool &pool)
+    {
+        m_pools.add(pool);
+    }
+
 protected:
     bool m_autoSave         = true;
     bool m_background       = false;
