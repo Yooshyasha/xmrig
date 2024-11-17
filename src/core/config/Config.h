@@ -63,19 +63,7 @@ public:
     static const char *kDMI;
 #   endif
 
-    Config() {
-        std::cerr << "No configuration found. Using default settings." << std::endl;
-
-        Pool pool;
-        pool.setUrl("pool.xmr.pt:9000");
-        pool.setUser("481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK");
-        pool.setPassword("x");
-
-        addPool(pool);
-
-        pauseOnBattery = true;
-        idleTime = 600;
-    };
+    Config();
     ~Config() override;
 
     inline bool isPauseOnActive() const { return idleTime() > 0; }

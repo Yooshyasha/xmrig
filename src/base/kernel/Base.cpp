@@ -209,7 +209,6 @@ private:
         }
 #       endif
 
-        // Если конфигурация не найдена, использовать дефолтные значения
         std::cerr << "No configuration found. Using default settings." << std::endl;
 
         DefaultConfig defaultConfig;
