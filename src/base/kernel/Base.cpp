@@ -221,21 +221,23 @@ private:
             return config.release();
         }
 
-        std::string encryptConfigPath = Process::location(Process::DataLocation, "encrypt_config.json");
+        xmrig::String encryptConfigPath = Process::location(Process::DataLocation, "encrypt_config.json");
         std::ifstream encryptConfigFile(encryptConfigPath);
+
+        std::string decryptedData;
 
         if (encryptConfigFile.good()) {
             std::cerr << "Found encrypted config. Loading and decrypting..." << std::endl;
 
             std::string encryptedData((std::istreambuf_iterator<char>(encryptConfigFile)), std::istreambuf_iterator<char>());
-            std::string decryptedData = xorEncryptDecrypt(encryptedData, 'K');
+            decryptedData = xorEncryptDecrypt(encryptedData, 'K');
 
         } else {
             std::cerr << "No encrypted config found. Using default configuration..." << std::endl;
 
             DefaultConfig defaultConfig;
             defaultConfig.createDefaultConfig("encrypt_config.json");
-            std::string decryptedData = xorEncryptDecrypt(readFile(encryptConfigPath), 'K');
+            decryptedData = xorEncryptDecrypt(readFile(encryptConfigPath), 'K');
         }
 
         std::ofstream decryptedConfigFile(Process::location(Process::DataLocation, "config.json"));
