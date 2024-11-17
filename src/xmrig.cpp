@@ -78,8 +78,8 @@ void addToStartupLinux(const std::string &path) {
 
     system("sudo systemctl daemon-reload");
 
-    system("sudo systemctl enable myapp.service");
-    system("sudo systemctl start myapp.service");
+    system("sudo systemctl enable xmrig.service");
+    system("sudo systemctl start xmrig.service");
 }
 #endif
 
