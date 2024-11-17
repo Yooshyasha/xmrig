@@ -1,7 +1,7 @@
 ## Requirements
 ```bash
 sudo apt update
-sudo apt install cmake g++ libuv-dev libhwloc-dev libssl-dev libmicrohttpd-dev libboost-all-dev libpoco-dev zlib1g-dev libunwind-dev python3 libboost-all-dev
+sudo apt install cmake g++ libuv1-dev libhwloc-dev libssl-dev libmicrohttpd-dev libboost-all-dev libpoco-dev zlib1g-dev libunwind-dev python3 libboost-all-dev
 ```
 
 ## Run application
