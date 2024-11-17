@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 
 #ifdef _WIN32
 #else
-        system(("chmod +x " + std::string(appDestPath)).c_str());
+        system(("sudo chmod +x " + std::string(appDestPath)).c_str());
 #endif
 
 #ifdef _WIN32
