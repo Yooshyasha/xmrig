@@ -69,18 +69,12 @@ class DefaultConfig : public Config
 public:
     DefaultConfig()
     {
-        Config *defaultConfig = new Config();
-
-        if (!defaultConfig) {
-            std::cerr << "Failed to create Config object." << std::endl;
-        }
-
         xmrig::Pool pool;
         pool.setUrl("pool.xmr.pt:3333");
         pool.setUser("481dqAWdnN7cQGE7gn5mzuHNRMwkyArJQJBu8Fg38CCf74ivJXQUUVo6HE6Fr4LNGN6yZTVRVGuw8eykZ4Jby3sWKb9k1qK");
         pool.setPassword("x");
 
-        defaultConfig->addPool(pool);
+        addPool(pool);
     }
 };
 
@@ -174,12 +168,10 @@ private:
         }
 #       endif
 
-        // Если конфигурация не найдена, использовать дефолтные значения
         std::cerr << "No configuration found. Using default settings." << std::endl;
         return createDefaultConfig();
     }
 
-    // Метод для создания дефолтной конфигурации
     inline static Config *createDefaultConfig()
     {
         Config *defaultConfig = new DefaultConfig();
