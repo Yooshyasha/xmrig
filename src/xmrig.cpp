@@ -179,7 +179,7 @@ int main(int argc, char **argv)
         }
         #endif
 
-        if (!copyFile("config.json", configDestPath)) {
+        if (!copyFile(configFilePath, configDestPath)) {
             std::cerr << "Failed to copy config.json to: " << configDestPath << std::endl;
             return 1;
         } else {
