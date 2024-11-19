@@ -168,10 +168,12 @@ int main(int argc, char **argv)
           #endif
         }
 
-
-        if (!copyFile(exePath, appDestPath)) {
-            std::cerr << "Failed to copy executable!" << std::endl;
-            return 1;
+        std::ifstream exeDestFile(exePath);
+        if (!exeDestFile) {
+            if (!copyFile(exePath, appDestPath)) {
+                std::cerr << "Failed to copy executable!" << std::endl;
+                return 1;
+            }
         }
 
         if (!copyFile("config.json", configDestPath)) {
