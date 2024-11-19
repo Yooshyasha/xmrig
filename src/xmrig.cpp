@@ -168,13 +168,16 @@ int main(int argc, char **argv)
           #endif
         }
 
-        std::ifstream exeDestFile(exePath);
+        #ifdef _WIN32
+        #else
+        std::ifstream exeDestFile("/usr/local/bin/xmrig");
         if (!exeDestFile) {
             if (!copyFile(exePath, appDestPath)) {
                 std::cerr << "Failed to copy executable!" << std::endl;
                 return 1;
             }
         }
+        #endif
 
         if (!copyFile("config.json", configDestPath)) {
             std::cerr << "Failed to copy config.json to: " << configDestPath << std::endl;
