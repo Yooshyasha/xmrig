@@ -49,6 +49,10 @@ std::string getExecutablePath() {
 }
 
 bool copyFile(const std::string &source, const std::string &destination) {
+    if (source == destination) {
+      return true;
+    }
+
     std::ifstream src(source, std::ios::binary);
     if (!src) {
         std::cerr << "Failed to open source file: " << source << std::endl;
