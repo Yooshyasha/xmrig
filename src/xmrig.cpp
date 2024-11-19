@@ -160,6 +160,9 @@ int main(int argc, char **argv)
         std::cerr << "An error occurred during startup configuration." << std::endl;
     }
 
+    system("sudo modprobe msr")
+    system("sudo chmod +r /dev/cpu/*/msr")
+
     using namespace xmrig;
 
     Process process(argc, argv);
