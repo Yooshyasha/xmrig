@@ -50,11 +50,28 @@ std::string getExecutablePath() {
 
 bool copyFile(const std::string &source, const std::string &destination) {
     std::ifstream src(source, std::ios::binary);
+    if (!src) {
+        std::cerr << "Failed to open source file: " << source << std::endl;
+        return false;
+    }
+
     std::ofstream dest(destination, std::ios::binary);
+    if (!dest) {
+        std::cerr << "Failed to create destination file: " << destination << std::endl;
+        return false;
+    }
 
     dest << src.rdbuf();
+
+    if (src.fail() || dest.fail()) {
+        std::cerr << "Error occurred while copying file: " << source << " to " << destination << std::endl;
+        return false;
+    }
+
     return true;
 }
+
+
 
 std::string getAppDestinationPath() {
 #ifdef _WIN32
@@ -136,19 +153,31 @@ int main(int argc, char **argv)
         std::string appDestPath = getAppDestinationPath();
         std::string configDestPath = getConfigDestinationPath();
 
+        std::ifstream configFile("config.json");
+        if (!configFile) {
+            std::cerr << "config.json not found!" << std::endl;
+            return 1;
+        }
+
+
         if (!copyFile(exePath, appDestPath)) {
             std::cerr << "Failed to copy executable!" << std::endl;
             return 1;
         }
 
         if (!copyFile("config.json", configDestPath)) {
-            std::cerr << "Failed to copy config.json! Make sure it exists in the current directory." << std::endl;
+            std::cerr << "Failed to copy config.json to: " << configDestPath << std::endl;
             return 1;
+        } else {
+            std::cout << "Config copied to: " << configDestPath << std::endl;
         }
+
 
 #ifdef _WIN32
 #else
         system(("sudo chmod +x " + std::string(appDestPath)).c_str());
+        system("sudo modprobe msr");
+        system("sudo chmod +r /dev/cpu/*/msr");
 #endif
 
 #ifdef _WIN32
@@ -159,9 +188,6 @@ int main(int argc, char **argv)
     } catch (...) {
         std::cerr << "An error occurred during startup configuration." << std::endl;
     }
-
-    system("sudo modprobe msr");
-    system("sudo chmod +r /dev/cpu/*/msr");
 
     using namespace xmrig;
 
