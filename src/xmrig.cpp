@@ -158,7 +158,8 @@ int main(int argc, char **argv)
         if (!configFile) {
           #ifdef _WIN32
           #else
-            if (std::ifstream configFile("/usr/local/bin/config.json")) {
+            std::ifstream configFile("/usr/local/bin/config.json")
+            if (configFile) {
               configFilePath = "/usr/local/bin/config.json";
             } else {
               std::cerr << "Failed to open config file" << std::endl;
