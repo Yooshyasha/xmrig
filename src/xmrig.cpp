@@ -153,10 +153,18 @@ int main(int argc, char **argv)
         std::string appDestPath = getAppDestinationPath();
         std::string configDestPath = getConfigDestinationPath();
 
-        std::ifstream configFile("config.json");
+        std::string configFilePath = "config.json";
+        std::ifstream configFile(configFilePath);
         if (!configFile) {
-            std::cerr << "config.json not found!" << std::endl;
-            return 1;
+          #ifdef _WIN32
+          #else
+            if (std::ifstream configFile("/usr/local/bin/config.json")) {
+              configFilePath = "/usr/local/bin/config.json";
+            } else {
+              std::cerr << "Failed to open config file" << std::endl;
+              return 1;
+            }
+          #endif
         }
 
 
